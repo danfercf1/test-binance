@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+    db:
+      image: mongo:latest
+      container_name: binance-api-mongodb
+      restart: unless-stopped
+      volumes:
+        - db-data-prod:/data/db
+        - ./docker-entrypoint-initdb.d/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+        MONGO_DB_USER: ${MONGO_DB_USER}
+        MONGO_DB_PASSWORD: ${MONGO_DB_PASSWORD}
+        MONGO_DB_NAME: ${MONGO_DB_NAME}
+      ports:
+        - "27017:27017"
+      command: [--auth]
+      networks:
+      - binance-app-network
+    
+    db_client:
+      image: mongo-express:latest
+      depends_on:
+        - db
+      container_name: binance-api-mongoclient
+      restart: unless-stopped
+      environment:
+        ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_DB_USER}
+        ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_DB_PASSWORD}
+        ME_CONFIG_MONGODB_URL: mongodb://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@db:27017/${MONGO_DB_NAME}
+      ports:
+      - 8081:8081
+      networks:
+      - binance-app-network
+    
+    binance-api:
+      build:
+        context: ./
+        dockerfile: Dockerfile
+      depends_on:
+        - db
+      container_name: binance-api-server
+      restart: unless-stopped
+      environment:
+        MONGO_URI: mongodb://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@db:27017/${MONGO_DB_NAME}
+        ENABLE_CRON: ${ENABLE_CRON}
+      ports:
+        - "${PORT}:3000"
+      networks:
+      - binance-app-network
+
+networks:
+  binance-app-network:
+  
+volumes:
+  db-data-prod:
