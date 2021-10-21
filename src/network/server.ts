@@ -70,6 +70,16 @@ class Server {
     await mongoose.connect(process.env.MONGO_URI as string, connection)
   }
 
+  private _cron() : void {
+    if (process.env.ENABLE_CRON as string === "1") {
+      const time = process.env.CRON_TIME as string
+      const cron = new CronC(time)
+      cron.process()
+      console.log('The cronJob is enabled')
+    } else
+      console.log('The cronJob is disabled')
+  }
+
   public start(): void {
     this.app.listen(this.app.get('port'), () =>
       console.log(`Server running at port ${this.app.get('port')}`)
@@ -77,14 +87,7 @@ class Server {
 
     try {
       this._mongo()
-      if (process.env.ENABLE_CRON as string === "1") {
-        const time = process.env.CRON_TIME as string
-        const cron = new CronC(time)
-        cron.process()
-        console.log('The cronJob is enabled')
-      } else
-        console.log('The cronJob is disabled')
-
+      this._cron()
     } catch (error) {
       console.error(error)
     }

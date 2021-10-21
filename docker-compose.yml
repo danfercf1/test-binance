@@ -45,6 +45,7 @@ services:
       restart: unless-stopped
       environment:
         MONGO_URI: mongodb://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@db:27017/${MONGO_DB_NAME}
+        CRON_TIME: ${CRON_TIME}
         ENABLE_CRON: ${ENABLE_CRON}
       ports:
         - "${PORT}:3000"
