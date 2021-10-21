@@ -26,7 +26,7 @@ MONGO_INITDB_ROOT_PASSWORD = my_root_pass
 MONGO_DB_USER = my_user
 MONGO_DB_PASSWORD = my_pass
 MONGO_DB_NAME = binance_dev
-CRON_TIME = * */1 * * * 
+CRON_TIME = */60 * * * *
 ENABLE_CRON = 1
 ```
 
