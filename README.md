@@ -35,5 +35,11 @@ ENABLE_CRON = 1
 Run the project following the next steps:
 
 ```bash
+npm run prepare
+```
+
+And then:
+
+```bash
 docker-compose up
 ```
